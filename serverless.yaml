@@ -1,0 +1,73 @@
+service: aws-lambda-leaderboard
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-north-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    COGNITO_USER_POOL_ID: eu-north-1_EXAMPLE
+    COGNITO_CLIENT_ID: 54p32d5n5j5m2t0gt45e9og8vo
+    COGNITO_CLIENT_SECRET: dnel7s515mgqk74rurtt1rhqsb0p21kgmu1nf1jdlcfvo04lvde
+    DYNAMODB_TABLE: leaderboard
+    WEBSOCKET_ENDPOINT: wss://gdjtdhxwkf.execute-api.eu-north-1.amazonaws.com/production/
+    CONNECTION_URL: https://gdjtdhxwkf.execute-api.eu-north-1.amazonaws.com/production/@connections
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-north-1:893130088846:table/leaderboard"
+    - Effect: Allow
+      Action:
+        - execute-api:ManageConnections
+      Resource: "arn:aws:execute-api:eu-north-1:893130088846:*"
+
+functions:
+  auth:
+    handler: dist/handlers/auth.handler
+    events:
+      - http:
+          path: auth/{action}
+          method: post
+          cors: true
+
+  submitScore:
+    handler: dist/handlers/score.submitHandler
+    events:
+      - http:
+          path: scores
+          method: post
+          cors: true
+          authorizer:
+            name: cognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: arn:aws:cognito-idp:eu-north-1:893130088846:userpool/eu-north-1_EXAMPLE
+
+  getLeaderboard:
+    handler: dist/handlers/leaderboard.getHandler
+    events:
+      - http:
+          path: leaderboard
+          method: get
+          cors: true
+
+  websocketConnect:
+    handler: dist/handlers/websocket.connectHandler
+    events:
+      - websocket:
+          route: $connect
+
+  websocketDisconnect:
+    handler: dist/handlers/websocket.disconnectHandler
+    events:
+      - websocket:
+          route: $disconnect
+
+plugins:
+  - serverless-webpack
