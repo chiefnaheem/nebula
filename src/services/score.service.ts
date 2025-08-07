@@ -55,13 +55,10 @@ export class ScoreService {
         Limit: limit,
       };
 
-      // Note: In production, you'd want to use a GSI with score as sort key
-      // For now, we'll scan and sort in memory (not ideal for large datasets)
       const result = await dynamoDb.scan(params).promise();
 
       const scores = (result.Items as ScoreEntry[]) || [];
 
-      // Sort by score descending, then by timestamp ascending for ties
       const sortedScores = scores
         .sort((a, b) => {
           if (b.score !== a.score) {

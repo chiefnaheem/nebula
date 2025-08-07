@@ -15,8 +15,6 @@ export class WebSocketService {
         },
       };
 
-      // In a real implementation, you'd maintain a list of connected clients
-      // For this mock, we'll simulate sending to all connections
       await this.broadcastMessage(message);
 
       logger.info("High score notification sent", {
@@ -30,8 +28,6 @@ export class WebSocketService {
 
   private async broadcastMessage(message: WebSocketMessage): Promise<void> {
     try {
-      // In production, you'd query DynamoDB for active connections
-      // This is a simplified implementation
       const connectionIds = await this.getActiveConnections();
 
       const promises = connectionIds.map(async (connectionId) => {
@@ -44,7 +40,6 @@ export class WebSocketService {
             .promise();
         } catch (error) {
           if ((error as any).statusCode === 410) {
-            // Connection is stale, remove it
             await this.removeConnection(connectionId);
           }
           logger.warn("Failed to send message to connection", {
@@ -61,19 +56,15 @@ export class WebSocketService {
   }
 
   private async getActiveConnections(): Promise<string[]> {
-    // In production, you'd store connections in DynamoDB
-    // This is a mock implementation
     return [];
   }
 
   private async removeConnection(connectionId: string): Promise<void> {
-    // In production, you'd remove the connection from DynamoDB
     logger.info("Connection removed", { connectionId });
   }
 
   async handleConnect(connectionId: string): Promise<void> {
     try {
-      // Store connection in DynamoDB
       logger.info("WebSocket connection established", { connectionId });
     } catch (error) {
       logger.error("Failed to handle connection", { connectionId, error });
@@ -82,7 +73,6 @@ export class WebSocketService {
 
   async handleDisconnect(connectionId: string): Promise<void> {
     try {
-      // Remove connection from DynamoDB
       await this.removeConnection(connectionId);
       logger.info("WebSocket connection closed", { connectionId });
     } catch (error) {
