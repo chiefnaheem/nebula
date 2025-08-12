@@ -3,6 +3,11 @@ import { ScoreEntry, WebSocketMessage } from "../types";
 import { logger } from "../utils/logger";
 
 export class WebSocketService {
+  private activeConnections = new Set<string>();
+
+  private async getActiveConnections(): Promise<string[]> {
+    return Array.from(this.activeConnections);
+  }
   async notifyHighScore(scoreEntry: ScoreEntry): Promise<void> {
     try {
       const message: WebSocketMessage = {
@@ -29,6 +34,7 @@ export class WebSocketService {
   private async broadcastMessage(message: WebSocketMessage): Promise<void> {
     try {
       const connectionIds = await this.getActiveConnections();
+      console.log(connectionIds, "connectionsiddss");
 
       const promises = connectionIds.map(async (connectionId) => {
         try {
@@ -55,20 +61,17 @@ export class WebSocketService {
     }
   }
 
-  private async getActiveConnections(): Promise<string[]> {
-    return [];
-  }
+  // private async getActiveConnections(): Promise<string[]> {
+  //   return [];
+  // }
 
   private async removeConnection(connectionId: string): Promise<void> {
     logger.info("Connection removed", { connectionId });
   }
 
   async handleConnect(connectionId: string): Promise<void> {
-    try {
-      logger.info("WebSocket connection established", { connectionId });
-    } catch (error) {
-      logger.error("Failed to handle connection", { connectionId, error });
-    }
+    this.activeConnections.add(connectionId);
+    logger.info("Connection stored in memory", { connectionId });
   }
 
   async handleDisconnect(connectionId: string): Promise<void> {
