@@ -46,6 +46,19 @@ export class ScoreService {
       throw error;
     }
   }
+  /*
+// Add to your table creation logic
+GlobalSecondaryIndexes: [{
+  IndexName: "UserIdIndex",
+  KeySchema: [
+    { AttributeName: "user_id", KeyType: "HASH" },
+    { AttributeName: "timestamp", KeyType: "RANGE" }
+  ],
+  Projection: {
+    ProjectionType: "ALL"
+  }
+}]
+  */
 
   async getTopScores(limit: number = 10): Promise<ScoreEntry[]> {
     try {

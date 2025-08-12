@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ResponseBuilder } from "../utils/response";
-import { validateRequest, authSchema } from "../utils/validation";
+import { validateRequest, authSchema, loginSchema } from "../utils/validation";
 import { logger } from "../utils/logger";
 import { AuthRequest } from "../types";
 import { AuthService } from "../services/auth.service";
@@ -30,8 +30,9 @@ export const handler = async (
       }
 
       case "login": {
+        console.log("Login action triggered", requestData);
         const authRequest = validateRequest<AuthRequest>(
-          authSchema,
+          loginSchema,
           requestData
         );
         const result = await authService.login(authRequest);

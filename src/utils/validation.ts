@@ -4,7 +4,12 @@ export const authSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(8).required(),
   name: Joi.string().optional(),
-  preferred_username: Joi.string().optional(),
+  preferred_username: Joi.string().required(),
+});
+
+export const loginSchema = Joi.object({
+  preferred_username: Joi.string().required(),
+  password: Joi.string().min(8).required(),
 });
 
 export const scoreSchema = Joi.object({

@@ -2,6 +2,8 @@ import { CognitoUserPool } from "amazon-cognito-identity-js";
 import { cognitoIdentityServiceProvider } from "../config/aws";
 import { AuthRequest, User } from "../types";
 import { logger } from "../utils/logger";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export class AuthService {
   private userPool: CognitoUserPool;
@@ -9,9 +11,16 @@ export class AuthService {
   private clientSecret = process.env.COGNITO_CLIENT_SECRET!;
 
   constructor() {
+    console.log(
+      "Initializing AuthService with User Pool ID:",
+      process.env.COGNITO_USER_POOL_ID,
+      process.env.COGNITO_CLIENT_ID
+    );
     this.userPool = new CognitoUserPool({
       UserPoolId: process.env.COGNITO_USER_POOL_ID!,
       ClientId: this.clientId,
+      // UserPoolId: "eu-north-1_ef3YYrtqE",
+      // ClientId: "2dndmhdbnofarg0vp7rusuc3c0",
     });
   }
 
@@ -31,13 +40,14 @@ export class AuthService {
 
       const params = {
         ClientId: this.clientId,
-        Username: email,
+        Username: preferred_username || email,
         Password: password,
-        SecretHash: this.generateSecretHash(email),
+        SecretHash: this.generateSecretHash(preferred_username!),
         UserAttributes: [
           { Name: "email", Value: email },
           { Name: "name", Value: name || email },
-          { Name: "preferred_username", Value: preferred_username || email },
+          { Name: "preferred_username", Value: preferred_username },
+          { Name: "phone_number", Value: "+2347065074555" },
         ],
       };
 
@@ -65,15 +75,15 @@ export class AuthService {
     authRequest: AuthRequest
   ): Promise<{ user: User; accessToken: string; idToken: string }> {
     try {
-      const { email, password } = authRequest;
+      const { preferred_username, password } = authRequest;
 
       const params = {
         AuthFlow: "USER_PASSWORD_AUTH" as const,
         ClientId: this.clientId,
         AuthParameters: {
-          USERNAME: email,
+          USERNAME: preferred_username!,
           PASSWORD: password,
-          SECRET_HASH: this.generateSecretHash(email),
+          SECRET_HASH: this.generateSecretHash(preferred_username!),
         },
       };
 
@@ -139,7 +149,7 @@ export class AuthService {
         }, {} as Record<string, string>) || {};
 
       return {
-        id: result.Username,
+        id: userAttributes.sub!,
         email: userAttributes.email,
         name: userAttributes.name,
         preferred_username: userAttributes.preferred_username,

@@ -9,21 +9,30 @@
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
-    "aws-sdk": "^2.1490.0",
     "amazon-cognito-identity-js": "^6.3.6",
-    "uuid": "^9.0.1",
+    "aws-sdk": "^2.1490.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
     "joi": "^17.11.0",
-    "winston": "^3.11.0",
-    "cors": "^2.8.5"
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.128",
+    "@types/body-parser": "^1.19.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.8.0",
     "@types/uuid": "^9.0.6",
-    "@types/aws-lambda": "^8.10.128",
-    "typescript": "^5.2.2",
+    "aws-sdk-mock": "^6.2.1",
+    "jest": "^30.0.5",
     "serverless": "^3.35.0",
     "serverless-webpack": "^5.13.0",
-    "webpack": "^5.89.0",
-    "ts-loader": "^9.5.0"
+    "ts-jest": "^29.4.1",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0"
   }
 }
